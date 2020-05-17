@@ -1,31 +1,95 @@
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Scanner;
 
 public class Game_management {
-	
+
 	static private int[] row = { 0, -1, 0, 1 };
 	static private int[] col = { -1, 0, 1, 0 };
 
+	public static void saveToFile(String path, String num, String cost, String time) throws IOException {
 
-	
-	public static String BFS(State start, State goal){
+		try {
+			PrintWriter pw = new PrintWriter("output.txt");
+			pw.write(path + "\n" + num + "\n" + cost + "\n" + time);
+			pw.close();
+		} catch (IOException e) {
+			throw new IOException("ERR:can't write in file: saveToFile");
+		}
+
+	}
+
+	public static String BFS(State start, State goal) throws IOException {
+		long startTime = System.nanoTime();
+		int count = 0;
 //		Queue L = new 
-		for (int i = 0; i < 4; i++) {
-			if(start.IsLegal(start.getX()+row[i], start.getY()+col[i])) {
-				State s = new State(start);
-				int x1=start.getX();
-				int y1= start.getY();
-				s.setCoordinate(x1, y1, x1+row[i], y1+col[i]);
+		Queue<State> q = new LinkedList<State>();
+//		Hashtable<Integer, State> h = new Hashtable<Integer, State>();
+		q.add(start);
+//		h.put(start.getId(), start);
+//		Hashtable<Integer, State> c = new Hashtable<Integer, State>();
+		while (!(q.isEmpty())) {
+			State node = q.remove();
+//			c.put(node.getId(), node);
+			count++;
+			for (int i = 0; i < 4; i++) {
+				if (node.IsLegal(node.getX() + row[i], node.getY() + col[i])) {
+					State s = new State(node);
+					count++;
+					s.setParent(node);
+					if (s.equals(node.getParent()))
+						continue;
+					int x1 = node.getX();
+					int y1 = node.getY();
+					int x2 = x1 + row[i];
+					int y2 = y1 + col[i];
+					if (i == 0) // should to improve this four conditions!!
+						s.setMove(s.getCoordinate(x2, y2) + "R-");
+					if (i == 1)
+						s.setMove(s.getCoordinate(x2, y2) + "D-");
+					if (i == 2)
+						s.setMove(s.getCoordinate(x2, y2) + "L-");
+					if (i == 3)
+						s.setMove(s.getCoordinate(x2, y2) + "U-");
+					if (s.isRed(x2, y2)) {
+						s.setCost(node.getCost() + 30);
+					} else {
+						s.setCost(node.getCost() + 1);
+					}
+					s.setCoordinate(x1, y1, x2, y2);
+//					if (!(c.containsKey(s.getId()) && !(h.containsKey(s.getId())))) {
+						if (s.equals(goal)) {
+							s.setMove(s.getMove().substring(0, 2));
+//						return s.path()+", count: "+count+", cost: "+s.getCost();
+							String path = s.path();
+							String num = "Num: " + count;
+							String value = "Cost: " + s.getCost();
+							long endTime = System.nanoTime();
+							long totalTime = endTime - startTime;
+
+							saveToFile(path, num, value, "" + totalTime);
+							return null;
+						}
+//					}
+					q.add(s);
+//					h.put(s.getId(), s);
+				}
 			}
 		}
-		return "finish";
+		String path = "no path";
+		String num = "Num: " + count;
+		saveToFile(path, num, "", "");
+		return "no path";
 	}
-	
 
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args) throws IOException {
 		boolean withOpen = false, withTime = false, blacks = false, reds = false;
 		Scanner in = new Scanner(new FileReader("input.txt")); // maybe i need to write "/input.txt" with "/"
 		String algo = in.nextLine();
@@ -102,7 +166,7 @@ public class Game_management {
 //		System.out.println(start.allIsLegal(1, 3));
 		System.out.println();
 		System.out.println(goal);
-		System.out.println(BFS(start,goal));
+		System.out.println(BFS(start, goal));
 	}
 
 }

@@ -12,6 +12,7 @@ public class State {
 	private ArrayList<Integer> red;
 	private State parent;
 	private String move;
+	private int count;
 	private int cost;
 	private int[] row = { 0, -1, 0, 1 };
 	private int[] col = { -1, 0, 1, 0 };
@@ -24,8 +25,8 @@ public class State {
 		this.n = n;
 		this.m = m;
 		parent = null;
-		move="";
-		cost=0;
+		move = "";
+		cost = 0;
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
 				mat[i][j] = start[i * m + j];
@@ -47,36 +48,24 @@ public class State {
 		System.out.println(this.black.toString());
 		System.out.println(this.red.toString());
 	}
-	
-//	/** Constructor for the middle state */
-//	public State(int n, int m, int[][] mat, int x, int y, ArrayList<Integer> black, ArrayList<Integer> red) {
-//		this.n=n;
-//		this.m=m;
-//		this.mat = new int[n][m];
-//		for (int i = 0; i < mat.length; i++) {
-//			for (int j = 0; j < mat[0].length; j++) {
-//				this.mat[i][j]=mat[i][j];
-//			}
-//		}
-//	}
-	
+
 	/** Copy constructor */
 	public State(State other) { // Init parent?
 //		id=++size; //maybe it's not good (design)
-		parent=other.getParent();
-		move=""; // don't sure about that!!
-		n=other.getN();
-		m=other.getM();
-		x=other.getX();
-		y=other.getY();
-		mat = new int [n][m];
-		int [][] temp = other.getMat();
+		parent = other.getParent();
+		move = ""; // don't sure about that!!
+		n = other.getN();
+		m = other.getM();
+		x = other.getX();
+		y = other.getY();
+		mat = new int[n][m];
+		int[][] temp = other.getMat();
 		for (int i = 0; i < temp.length; i++) {
 			for (int j = 0; j < temp[0].length; j++) {
-				this.mat[i][j]=temp[i][j];
+				this.mat[i][j] = temp[i][j];
 			}
 		}
-		mat[x][y]=0;
+		mat[x][y] = 0;
 		this.black = new ArrayList<Integer>();
 		for (Integer num : other.getBlack()) {
 			this.black.add(num);
@@ -90,17 +79,39 @@ public class State {
 	/** Constructor for the goal state */
 	public State(int n, int m) {
 		parent = null;
-		move="";
+		move = "";
 		mat = new int[n][m];
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
 				mat[i][j] = i * m + j + 1;
-				mat[i][j] = i * m + j + 1;
+				mat[i][j] = i * m + j + 1; // why two times??
 			}
 		}
 		mat[n - 1][m - 1] = 0;
 		x = n - 1;
 		y = m - 1;
+	}
+	
+	public State cutOff(int n, int m) {
+		State cutOff = new State(n,m);
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				cutOff.setValue(i, j, 0);
+//				mat[i][j] = i * m + j + 1;
+			}
+		}
+		return cutOff;
+	}
+	
+	public State fail(int n, int m) {
+		State fail = new State(n,m);
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				fail.setValue(i, j, -1);
+//				mat[i][j] = i * m + j + 1;
+			}
+		}
+		return fail;
 	}
 
 	public String toString() {
@@ -117,7 +128,19 @@ public class State {
 			return false;
 		return true;
 	}
-	
+
+	public boolean IsParent(int row, int column) {
+		int x =getX();
+		int y= getY();
+		setCoordinate(x, y, row, column);
+		if (equals(getParent())) {
+			setCoordinate(row, column, x, y);
+			return true;
+		}
+		setCoordinate(row, column, x, y);
+		return false;
+	}
+
 //	public boolean allIsLegal(int row, int column) {
 //		for (int i = 0; i < 4; i++) {
 //			if(!(IsLegal(x+this.row[i], y+col[i])))
@@ -161,7 +184,7 @@ public class State {
 	public ArrayList<Integer> getRed() {
 		return red;
 	}
-	
+
 //	public int getId() {
 //		return id;
 //	}
@@ -181,9 +204,17 @@ public class State {
 	public void setMove(String move) {
 		this.move = move;
 	}
-	
+
 	public int getCost() {
 		return cost;
+	}
+
+	public int getCount() {
+		return count;
+	}
+
+	public void setCount(int count) {
+		this.count = count;
 	}
 
 	public void setCost(int cost) {
@@ -195,26 +226,30 @@ public class State {
 	}
 
 	public void setCoordinate(int x1, int y1, int x2, int y2) {
-		int tmp=mat[x1][y1];
-		mat[x1][y1]=mat[x2][y2];
-		mat[x2][y2]=tmp;
-		x=x2;
-		y=y2;
+		int tmp = mat[x1][y1];
+		mat[x1][y1] = mat[x2][y2];
+		mat[x2][y2] = tmp;
+		x = x2;
+		y = y2;
 	}
 	
+	public void setValue(int x, int y, int value) { // maybe it is better to overload setCoordinate..
+		mat[x][y] = value;
+	}
+
 	public boolean isRed(int x, int y) {
 		if (red.contains(mat[x][y]))
 			return true;
 		return false;
 	}
-	
+
 	public boolean equals(State s) {
-		if(s==null)
-			return false; //what if "this" is null too???
-		int [][] tmp = s.getMat();
+		if (s == null)
+			return false; // what if "this" is null too???
+		int[][] tmp = s.getMat();
 		for (int i = 0; i < tmp.length; i++) {
 			for (int j = 0; j < tmp[0].length; j++) {
-				if(mat[i][j]!=tmp[i][j])
+				if (mat[i][j] != tmp[i][j])
 					return false;
 			}
 		}
@@ -222,9 +257,9 @@ public class State {
 	}
 
 	public String path() {
-		if(parent==null)
+		if (parent == null)
 			return move;
-		return parent.path()+move;
+		return parent.path() + move;
 	}
 
 }

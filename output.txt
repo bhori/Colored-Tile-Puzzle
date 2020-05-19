@@ -1,4 +1,2 @@
-8R-11D-7L-8U
-Num: 59
-Cost: 33
-375000
+no path
+Num: 1

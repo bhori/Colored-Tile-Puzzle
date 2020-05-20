@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 
 public class State {
 	private int[][] mat;
@@ -10,6 +11,8 @@ public class State {
 	private int y;
 	private ArrayList<Integer> black;
 	private ArrayList<Integer> red;
+//	private Hashtable<Integer, Boolean> black;
+//	private Hashtable<Integer, Boolean> red;
 	private State parent;
 	private String move;
 	private int count;
@@ -45,8 +48,6 @@ public class State {
 		for (Integer num : red) {
 			this.red.add(num);
 		}
-		System.out.println(this.black.toString());
-		System.out.println(this.red.toString());
 	}
 
 	/** Copy constructor */
@@ -260,6 +261,37 @@ public class State {
 		if (parent == null)
 			return move;
 		return parent.path() + move;
+	}
+	
+	public int heuristic() {	// what to do with the black tiles? infinite value?
+		int manhattanDistanceSum = 0;
+		for (int x = 0; x < n; x++) // x-dimension, traversing rows (i)
+		    for (int y = 0; y < m; y++) { // y-dimension, traversing cols (j)
+		        int value = mat[x][y]; // tiles array contains board elements
+		        if (value != 0 && !(black.contains(value))) { // we don't compute MD for element 0
+		            int targetX = (value - 1) / m; // expected x-coordinate (row)
+		            int targetY = (value - 1) % m; // expected y-coordinate (col)
+		            int dx = x - targetX; // x-distance to expected coordinate
+		            int dy = y - targetY; // y-distance to expected coordinate
+//		            int targetX;
+//		            int targetY;
+//					if(value%m==0) {
+//						targetX = value/m -1;
+//						targetY = m-1;
+//					} else {
+//						targetX = value/m;
+//						targetY = value%m -1;
+//					}
+//					 int dx = x - targetX; // x-distance to expected coordinate
+//			         int dy = y - targetY; // y-distance to expected coordinate
+		            if(isRed(x, y)) {
+		            	dx=dx*30;
+		            	dy=dy*30;	
+		            }
+		            manhattanDistanceSum += Math.abs(dx) + Math.abs(dy); 
+		        } 
+		    }
+		return manhattanDistanceSum;
 	}
 
 }

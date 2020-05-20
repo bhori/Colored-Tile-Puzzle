@@ -10,20 +10,20 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 
-public class Game_management {
+public class Ex1 {
 	private static boolean withOpen = false, withTime = false, blacks = false, reds = false;
 
 	public static String summary(State n, double totalTime) {
 		String path = n.path();
 		String num = "Num: " + n.getCount();
 		String value = "Cost: " + n.getCost();
-		String time="";
-		if(withTime)
+		String time = "";
+		if (withTime)
 			time = new DecimalFormat("0.000").format(totalTime) + " seconds";
 		if (path.equals("no path"))
 			return path + "\n" + num;
 //		String value = "Cost: " + n.getCost();
-		return path + "\n" + num + "\n" + value + "\n"+time;
+		return path + "\n" + num + "\n" + value + "\n" + time;
 	}
 
 	public static void saveToFile(String summary) throws IOException {
@@ -55,39 +55,39 @@ public class Game_management {
 	public static State readInput() throws FileNotFoundException {
 //		boolean withOpen = false, withTime = false, blacks = false, reds = false;
 		Scanner in = new Scanner(new FileReader("input.txt")); // maybe i need to write "/input.txt" with "/"
-		String algo = in.nextLine();
+		in.nextLine();
 		String time = in.nextLine();
 		String open = in.nextLine();
 		String dimension = in.nextLine();
 		String black = in.nextLine();
 		String red = in.nextLine();
-		if (time.contains("with"))
+//		if (time.contains("with"))
+//			withTime = true;
+//		if (open.contains("with"))
+//			withOpen = true;
+		if (time.equals("with time"))
 			withTime = true;
-		if (open.contains("with"))
+		if (open.equals("with open"))
 			withOpen = true;
 		int n = Integer.parseInt(dimension.substring(0, dimension.indexOf('x')));
 		int m = Integer.parseInt(dimension.substring(dimension.indexOf('x') + 1));
 		ArrayList<String> black2 = new ArrayList<String>();
 		ArrayList<Integer> black3 = new ArrayList<Integer>();
 		if (black.length() > 7) {
-//			blacks = true;
 			black = black.substring(7);
 			black2 = new ArrayList<String>(Arrays.asList(black.split(",")));
 			for (String string : black2) {
 				black3.add(Integer.parseInt(string));
 			}
-			System.out.println(black3.toString());
 		}
 		ArrayList<String> red2 = new ArrayList<String>();
 		ArrayList<Integer> red3 = new ArrayList<Integer>();
 		if (red.length() > 5) {
-//			reds = true;
 			red = red.substring(5);
 			red2 = new ArrayList<String>(Arrays.asList(red.split(",")));
 			for (String string : red2) {
 				red3.add(Integer.parseInt(string));
 			}
-			System.out.println(red3.toString());
 		}
 		String content = "";
 		while (in.hasNextLine()) {
@@ -110,17 +110,40 @@ public class Game_management {
 	}
 
 	public static void main(String[] args) throws IOException {
+		Scanner in = new Scanner(new FileReader("input.txt"));
+		String algo = in.nextLine();
+		in.close();
 		State start = readInput();
 		State goal = new State(start.getN(), start.getM());
-		System.out.println(start);
-		System.out.println();
-		System.out.println(goal);
-		/**		should be here switch case for the algorithm	 **/
 		long startTime = System.nanoTime();
-//		start = Algorithms.BFS(start, goal);
-		start = Algorithms.DFID(start, goal);
-		System.out.println("success!");
+		/** should be here switch case for the algorithm **/
+		switch (algo) {
+		case "BFS":
+			start = Algorithms.BFS(start, goal, withOpen);
+			break;
+		case "DFID":
+			start = Algorithms.DFID(start, goal);
+			break;
+		case "A*":
+			start = Algorithms.A_Star(start, goal, withOpen);
+			break;
+		case "IDA*":
+
+			break;
+		case "DFBnB":
+
+			break;
+
+		default:
+			break;
+		}
+//		long startTime = System.nanoTime();
+//		start = Algorithms.BFS(start, goal, withOpen);
+//		start = Algorithms.DFID(start, goal);
+//		start = Algorithms.A_Star(start, goal, withOpen);
+//		System.out.println("success!");
 		long endTime = System.nanoTime();
+		System.out.println("success!");
 		double totalTime = (endTime - startTime) / 1000000000.0;
 		String summary = summary(start, totalTime);
 		saveToFile(summary);

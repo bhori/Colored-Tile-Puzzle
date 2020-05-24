@@ -66,7 +66,9 @@ public class Algorithms {
 					if (!(closedList.containsKey(s.toString()) && !(openList.containsKey(s.toString())))) {
 //					if (c.get(s.toString())==null && h.get(s.toString())==null) {
 						if (s.equals(goal)) {
-							s.setMove(s.getMove().substring(0, 2));
+							String move = s.getMove();
+							move = move.substring(0, move.indexOf('-'));
+							s.setMove(move);
 //						return s.path()+", count: "+count+", cost: "+s.getCost();
 //							String path = s.path();
 //							String num = "Num: " + count;
@@ -120,7 +122,9 @@ public class Algorithms {
 		State fail = node.fail(node.getN(), node.getM());
 //		if (node.equals(goal) && node.getMove().length() > 0) { // maybe the second condition is not necessary
 		if (node.equals(goal)) {
-			node.setMove(node.getMove().substring(0, 2));
+			String move = node.getMove();
+			move = move.substring(0, move.indexOf('-'));
+			node.setMove(move);
 			return node;
 		} else if (limit == 0) {
 			return cutOff;
@@ -201,11 +205,20 @@ public class Algorithms {
 		queue.add(start);
 		openList.put(start.toString(), start);
 		Hashtable<String, State> closedList = new Hashtable<String, State>();
+		int iteration = 0;
 		while (!(queue.isEmpty())) {
+			iteration++;
 			State node = queue.poll(); // maybe should use q.pool??
 			openList.remove(node.toString());
 			if (withOpen) {
 				System.out.println("open list:\n\n" + openList.keySet() + "\n");
+			}
+			if (node.equals(goal)) { // what about the start node? it don't have "move" field for substring...
+				String move = node.getMove();
+				move = move.substring(0, move.indexOf('-'));
+				node.setMove(move);
+				node.setCount(count);
+				return node;
 			}
 			closedList.put(node.toString(), node);
 			for (int i = 0; i < 4; i++) {
@@ -233,22 +246,26 @@ public class Algorithms {
 					default:
 						break;
 					}
+					s.setMoveID(i);
 					if (s.isRed(x2, y2)) {
 						s.setCost(node.getCost() + 30);
 					} else {
 						s.setCost(node.getCost() + 1);
 					}
 					s.setCoordinate(x1, y1, x2, y2);
+					s.setIteration(iteration);
 					if (!(closedList.containsKey(s.toString()) && !(openList.containsKey(s.toString())))) {
-//					if (c.get(s.toString())==null && h.get(s.toString())==null) {
-						if (s.equals(goal)) {
-							s.setMove(s.getMove().substring(0, 2));
-							s.setCount(count);
-							return s;
+						queue.add(s);
+						openList.put(s.toString(), s);
+					} else if (openList.containsKey(s.toString())) {
+						State old = openList.get(s.toString());
+						if (old.getCost() > s.getCost()) {
+							queue.remove(old); // don't sure about that!!
+							openList.remove(old.toString());
+							queue.add(s);
+							openList.put(s.toString(), s);
 						}
 					}
-					queue.add(s);
-					openList.put(s.toString(), s);
 				}
 			}
 		}

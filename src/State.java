@@ -4,7 +4,6 @@ import java.util.Hashtable;
 
 public class State {
 	private int[][] mat;
-//	private int id;
 	private int n;
 	private int m;
 	private int x;
@@ -15,21 +14,24 @@ public class State {
 //	private Hashtable<Integer, Boolean> red;
 	private State parent;
 	private String move;
+	private int moveID;
 	private int count;
 	private int cost;
+	int iteration;
 	private int[] row = { 0, -1, 0, 1 };
 	private int[] col = { -1, 0, 1, 0 };
-//	public static int size=0;
 
 	/** Constructor for the start state */
 	public State(int n, int m, int[] start, ArrayList<Integer> black, ArrayList<Integer> red) {
-//		id=++size;
 		mat = new int[n][m];
 		this.n = n;
 		this.m = m;
 		parent = null;
 		move = "";
+		moveID=0; // maybe -1?
 		cost = 0;
+		count = 1; // should be 0??
+		iteration=0;
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
 				mat[i][j] = start[i * m + j];
@@ -98,6 +100,7 @@ public class State {
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
 				cutOff.setValue(i, j, 0);
+//				cutOff.getMat()[i][j]=0;		
 //				mat[i][j] = i * m + j + 1;
 			}
 		}
@@ -206,8 +209,20 @@ public class State {
 		this.move = move;
 	}
 
+	public int getMoveID() {
+		return moveID;
+	}
+
+	public void setMoveID(int moveID) {
+		this.moveID = moveID;
+	}
+
 	public int getCost() {
 		return cost;
+	}
+	
+	public void setCost(int cost) {
+		this.cost = cost;
 	}
 
 	public int getCount() {
@@ -218,8 +233,12 @@ public class State {
 		this.count = count;
 	}
 
-	public void setCost(int cost) {
-		this.cost = cost;
+	public int getIteration() {
+		return iteration;
+	}
+
+	public void setIteration(int iteration) {
+		this.iteration = iteration;
 	}
 
 	public int getCoordinate(int x, int y) {

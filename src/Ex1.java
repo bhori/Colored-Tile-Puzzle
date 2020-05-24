@@ -128,7 +128,7 @@ public class Ex1 {
 			start = Algorithms.A_Star(start, goal, withOpen);
 			break;
 		case "IDA*":
-
+			start = Algorithms.IDA_Star(start, goal);
 			break;
 		case "DFBnB":
 

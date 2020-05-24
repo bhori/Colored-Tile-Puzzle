@@ -18,6 +18,7 @@ public class State {
 	private int count;
 	private int cost;
 	int iteration;
+	int out; //for IDA* and DFBnB, 1 marks "out" 
 	private int[] row = { 0, -1, 0, 1 };
 	private int[] col = { -1, 0, 1, 0 };
 
@@ -32,6 +33,7 @@ public class State {
 		cost = 0;
 		count = 1; // should be 0??
 		iteration=0;
+		out=0;
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
 				mat[i][j] = start[i * m + j];
@@ -54,13 +56,13 @@ public class State {
 
 	/** Copy constructor */
 	public State(State other) { // Init parent?
-//		id=++size; //maybe it's not good (design)
 		parent = other.getParent();
 		move = ""; // don't sure about that!!
 		n = other.getN();
 		m = other.getM();
 		x = other.getX();
 		y = other.getY();
+		out=out;
 		mat = new int[n][m];
 		int[][] temp = other.getMat();
 		for (int i = 0; i < temp.length; i++) {
@@ -241,6 +243,14 @@ public class State {
 		this.iteration = iteration;
 	}
 
+	public int getOut() {
+		return out;
+	}
+
+	public void setOut(int out) {
+		this.out = out;
+	}
+
 	public int getCoordinate(int x, int y) {
 		return mat[x][y];
 	}
@@ -311,6 +321,11 @@ public class State {
 		        } 
 		    }
 		return manhattanDistanceSum;
+	}
+	
+	public int f() {
+		int f = getCost()+heuristic();
+		return f;
 	}
 
 }

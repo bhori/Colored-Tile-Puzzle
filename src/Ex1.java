@@ -131,7 +131,7 @@ public class Ex1 {
 			start = Algorithms.IDA_Star(start, goal);
 			break;
 		case "DFBnB":
-
+			start = Algorithms.DFBnB(start, goal);
 			break;
 
 		default:

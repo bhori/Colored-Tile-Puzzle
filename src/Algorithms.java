@@ -369,7 +369,7 @@ public class Algorithms {
 		return start;
 	}
 
-	public static void removeFromStack(Stack<State> stack, State state) {
+	private static void removeFromStack(Stack<State> stack, State state) {
 		Stack<State> tmp = new Stack<State>();
 		while (!(stack.isEmpty())) {
 			State s = (State) stack.pop();

@@ -3,26 +3,26 @@ import java.util.Arrays;
 import java.util.Hashtable;
 
 public class State {
-	private int[][] mat;
+	private int[][] mat; //Represents the board for this state
 	private int n;
 	private int m;
-	private int x;
-	private int y;
+	private int x; //Holds the x-coordinate (row) of the empty place ('_'/0)
+	private int y; //Holds the y-coordinate (col) of the empty place ('_'/0)
 	private ArrayList<Integer> black;
 	private ArrayList<Integer> red;
 //	private Hashtable<Integer, Boolean> black;
 //	private Hashtable<Integer, Boolean> red;
 	private State parent;
-	private String move;
-	private int moveID;
-	private int count;
-	private int cost;
-	int iteration;
+	private String move; //The step taken to reach this state
+	private int moveID; //Value between 0-3, Indicates the direction of the step that created this state (0-left,1-up,2-right,3-down), useful for A*, IDA* and DFBnB for local priority ordering
+	private int count; //Holds the amount of vertices created up to this state
+	private int cost; //Holds the required cost up to this state
+	int iteration; //Holds the iteration in the algorithm that created this state, is used to sort vertices with equal f values, useful for A*, IDA* and DFBnB for priority ordering
 	int out; //for IDA* and DFBnB, 1 marks "out" 
 	private int[] row = { 0, -1, 0, 1 };
 	private int[] col = { -1, 0, 1, 0 };
 
-	/** Constructor for the start state */
+	/** Constructor for the initial state */
 	public State(int n, int m, int[] start, ArrayList<Integer> black, ArrayList<Integer> red) {
 		mat = new int[n][m];
 		this.n = n;
@@ -190,10 +190,6 @@ public class State {
 	public ArrayList<Integer> getRed() {
 		return red;
 	}
-
-//	public int getId() {
-//		return id;
-//	}
 
 	public State getParent() {
 		return parent;

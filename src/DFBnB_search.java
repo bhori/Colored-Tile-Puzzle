@@ -79,7 +79,8 @@ public class DFBnB_search {
 					if (state.f() >= t) {
 						while (i < children.size())
 							children.remove(i);
-					} else if (h.containsKey(state.toString())) {
+//					} else if (h.containsKey(state.toString())) {
+					} else if (h.get(state.toString())!=null) {
 						State old = h.get(state.toString());
 						if (old.getOut() == 1) {
 							children.remove(state);
@@ -89,10 +90,11 @@ public class DFBnB_search {
 							} else {
 								removeFromStack(stack, old); //this function is neccesary? maybe pop is enough...
 //								stack.pop();
+								stack.remove(old);
 								h.remove(old.toString());
 							}
 						}
-					} else if (state.equals(goal)) {
+					} else if (state.isGoal(goal)) {
 						t = state.f();
 						String move = state.getMove();
 						move = move.substring(0, move.indexOf('-'));

@@ -3,7 +3,7 @@ import java.util.Arrays;
 import java.util.Hashtable;
 
 public class State {
-	private int[][] mat; //Represents the board for this state
+	private int[][] board; //Represents the board for this state
 	private int n;
 	private int m;
 	private int x; //Holds the x-coordinate (row) of the empty place ('_'/0)
@@ -14,7 +14,7 @@ public class State {
 //	private Hashtable<Integer, Boolean> red;
 	private State parent;
 	private String move; //The step taken to reach this state
-	private int moveID; //Value between 0-3, Indicates the direction of the step that created this state (0-left,1-up,2-right,3-down), useful for A*, IDA* and DFBnB for local priority ordering
+	private int moveID=-1; //Value between 0-3, Indicates the direction of the step that created this state (0-left,1-up,2-right,3-down), useful for A*, IDA* and DFBnB for local priority ordering
 	private int count; //Holds the amount of vertices created up to this state
 	private int cost; //Holds the required cost up to this state
 	int iteration; //Holds the iteration in the algorithm that created this state, is used to sort vertices with equal f values, useful for A*, IDA* and DFBnB for priority ordering
@@ -24,21 +24,21 @@ public class State {
 
 	/** Constructor for the initial state */
 	public State(int n, int m, int[] start, ArrayList<Integer> black, ArrayList<Integer> red) {
-		mat = new int[n][m];
+		board = new int[n][m];
 		this.n = n;
 		this.m = m;
 		parent = null;
 		move = "";
-		moveID=0; // maybe -1?
+		moveID=-1; // maybe -1?
 		cost = 0;
 		count = 1; // should be 0??
 		iteration=0;
 		out=0;
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
-				mat[i][j] = start[i * m + j];
-				mat[i][j] = start[i * m + j];
-				if (mat[i][j] == 0) {
+				board[i][j] = start[i * m + j];
+				board[i][j] = start[i * m + j];
+				if (board[i][j] == 0) {
 					x = i;
 					y = j;
 				}
@@ -63,14 +63,14 @@ public class State {
 		x = other.getX();
 		y = other.getY();
 		out=out;
-		mat = new int[n][m];
-		int[][] temp = other.getMat();
+		board = new int[n][m];
+		int[][] temp = other.getBoard();
 		for (int i = 0; i < temp.length; i++) {
 			for (int j = 0; j < temp[0].length; j++) {
-				this.mat[i][j] = temp[i][j];
+				this.board[i][j] = temp[i][j];
 			}
 		}
-		mat[x][y] = 0;
+		board[x][y] = 0;
 		this.black = new ArrayList<Integer>();
 		for (Integer num : other.getBlack()) {
 			this.black.add(num);
@@ -85,14 +85,14 @@ public class State {
 	public State(int n, int m) {
 		parent = null;
 		move = "";
-		mat = new int[n][m];
+		board = new int[n][m];
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
-				mat[i][j] = i * m + j + 1;
-				mat[i][j] = i * m + j + 1; // why two times??
+				board[i][j] = i * m + j + 1;
+				board[i][j] = i * m + j + 1; // why two times??
 			}
 		}
-		mat[n - 1][m - 1] = 0;
+		board[n - 1][m - 1] = 0;
 		x = n - 1;
 		y = m - 1;
 	}
@@ -102,8 +102,8 @@ public class State {
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
 				cutOff.setValue(i, j, 0);
-//				cutOff.getMat()[i][j]=0;		
-//				mat[i][j] = i * m + j + 1;
+//				cutOff.getboard()[i][j]=0;		
+//				board[i][j] = i * m + j + 1;
 			}
 		}
 		return cutOff;
@@ -114,7 +114,7 @@ public class State {
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
 				fail.setValue(i, j, -1);
-//				mat[i][j] = i * m + j + 1;
+//				board[i][j] = i * m + j + 1;
 			}
 		}
 		return fail;
@@ -122,7 +122,7 @@ public class State {
 
 	public String toString() {
 		String s = "";
-		for (int[] row : mat)
+		for (int[] row : board)
 			s += Arrays.toString(row) + "\n";
 		return s;
 	}
@@ -130,7 +130,7 @@ public class State {
 	public boolean IsLegal(int row, int column) {
 		if (!(row >= 0 && row < n && column >= 0 && column < m))
 			return false;
-		if (black.contains(mat[row][column]))
+		if (black.contains(board[row][column]))
 			return false;
 		return true;
 	}
@@ -179,8 +179,8 @@ public class State {
 		this.y = y;
 	}
 
-	public int[][] getMat() {
-		return mat;
+	public int[][] getBoard() {
+		return board;
 	}
 
 	public ArrayList<Integer> getBlack() {
@@ -248,34 +248,43 @@ public class State {
 	}
 
 	public int getCoordinate(int x, int y) {
-		return mat[x][y];
+		return board[x][y];
 	}
 
 	public void setCoordinate(int x1, int y1, int x2, int y2) {
-		int tmp = mat[x1][y1];
-		mat[x1][y1] = mat[x2][y2];
-		mat[x2][y2] = tmp;
+		int tmp = board[x1][y1];
+		board[x1][y1] = board[x2][y2];
+		board[x2][y2] = tmp;
 		x = x2;
 		y = y2;
 	}
 	
 	public void setValue(int x, int y, int value) { // maybe it is better to overload setCoordinate..
-		mat[x][y] = value;
+		board[x][y] = value;
 	}
-
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 * @return true if board[x][y] is red, otherwise return false
+	 */
 	public boolean isRed(int x, int y) {
-		if (red.contains(mat[x][y]))
+		if (red.contains(board[x][y]))
 			return true;
 		return false;
+	}
+	
+	public boolean isGoal(State goal) {
+		return equals(goal);
 	}
 
 	public boolean equals(State s) {
 		if (s == null)
 			return false; // what if "this" is null too???
-		int[][] tmp = s.getMat();
+		int[][] tmp = s.getBoard();
 		for (int i = 0; i < tmp.length; i++) {
 			for (int j = 0; j < tmp[0].length; j++) {
-				if (mat[i][j] != tmp[i][j])
+				if (board[i][j] != tmp[i][j])
 					return false;
 			}
 		}
@@ -288,11 +297,15 @@ public class State {
 		return parent.path() + move;
 	}
 	
+	/**
+	 * Computes the heuristic function of the state
+	 * @return the value of the heuristic function
+	 */
 	public int heuristic() {	// what to do with the black tiles? infinite value?
 		int manhattanDistanceSum = 0;
 		for (int x = 0; x < n; x++) // x-dimension, traversing rows (i)
 		    for (int y = 0; y < m; y++) { // y-dimension, traversing cols (j)
-		        int value = mat[x][y]; // tiles array contains board elements
+		        int value = board[x][y]; // tiles array contains board elements
 		        if (value != 0 && !(black.contains(value))) { // we don't compute MD for element 0
 		            int targetX = (value - 1) / m; // expected x-coordinate (row)
 		            int targetY = (value - 1) % m; // expected y-coordinate (col)
@@ -319,6 +332,10 @@ public class State {
 		return manhattanDistanceSum;
 	}
 	
+	/**
+	 * Computes the 'f' function of the state which is the sum of the heuristic function and the cost till this state
+	 * @return the value of the 'f' function
+	 */
 	public int f() {
 		int f = getCost()+heuristic();
 		return f;

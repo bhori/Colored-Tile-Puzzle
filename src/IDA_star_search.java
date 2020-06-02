@@ -4,21 +4,21 @@ import java.util.Stack;
 public class IDA_star_search {
 	private static int[] row = { 0, 1, 0, -1 };
 	private static int[] col = { 1, 0, -1, 0 };
-	
-	private static void removeFromStack(Stack<State> stack, State state) {
-		Stack<State> tmp = new Stack<State>();
-		while (!(stack.isEmpty())) {
-			State s = (State) stack.pop();
-			if (s.equals(state))
-				break;
-			tmp.push(s);
-		}
-		while (!(tmp.isEmpty())) {
-			stack.push(tmp.pop());
-		}
 
-	}
-		
+//	private static void removeFromStack(Stack<State> stack, State state) {
+//		Stack<State> tmp = new Stack<State>();
+//		while (!(stack.isEmpty())) {
+//			State s = (State) stack.pop();
+//			if (s.equals(state))
+//				break;
+//			tmp.push(s);
+//		}
+//		while (!(tmp.isEmpty())) {
+//			stack.push(tmp.pop());
+//		}
+//
+//	}
+
 	public static State IDA_Star(State start, State goal) {
 		Stack<State> stack = new Stack<State>();
 		Hashtable<String, State> h = new Hashtable<String, State>();
@@ -73,21 +73,35 @@ public class IDA_star_search {
 								min = Math.min(min, s.f());
 								continue;
 							}
-							if (h.containsKey(s.toString())) {
+//							if (h.containsKey(s.toString())) {
+/*							if (h.get(s.toString()) != null) {
 								State old = h.get(s.toString());
 								if (old.getOut() == 1) {
 									continue;
 								} else {
 									if (old.f() > s.f()) {
-										removeFromStack(stack, old); //this function is neccesary? maybe pop is enough...
+//										removeFromStack(stack, old); // this function is neccesary? maybe pop is
+																		// enough...
 //										stack.pop();
+										stack.remove(old);
 										h.remove(old.toString());
 									} else {
 										continue;
 									}
 								}
+							}*/
+							if (h.get(s.toString()) != null && h.get(s.toString()).getOut()==1)
+								continue;
+							if (h.get(s.toString()) != null && h.get(s.toString()).getOut()!=1) {
+								State old = h.get(s.toString());
+								if (old.f() > s.f()) {
+									stack.remove(old);
+									h.remove(old.toString());
+								}else {
+									continue;
+								}
 							}
-							if (s.equals(goal)) {
+							if (s.isGoal(goal)) {
 								String move = s.getMove();
 								move = move.substring(0, move.indexOf('-'));
 								s.setMove(move);

@@ -13,12 +13,21 @@ public class BFS_search {
 		queue.add(start);
 		openList.put(start.toString(), start);
 		Hashtable<String, State> closedList = new Hashtable<String, State>();
+		int iteration=1;
 		while (!(queue.isEmpty())) {
-			State node = queue.remove(); // maybe should use q.pool??
-			openList.remove(node.toString());
+//			State node = queue.poll(); // maybe should use q.pool??
+//			openList.remove(node.toString());
 			if (withOpen) {
-				System.out.println("open list:\n\n" + openList.keySet() + "\n");
+				System.out.println("iteration "+iteration+" open list:\n");
+				for (String state : openList.keySet()) {
+					System.out.println(state);
+				}
+				System.out.println();
+//				System.out.println("iteration "+iteration+" open list:\n\n" + openList.keySet() + "\n");
 			}
+			State node = queue.poll(); // maybe should use q.pool??
+			openList.remove(node.toString());
+			iteration++;
 			closedList.put(node.toString(), node);
 			for (int i = 0; i < 4; i++) {
 				int x1 = node.getX();
@@ -51,18 +60,18 @@ public class BFS_search {
 						s.setCost(node.getCost() + 1);
 					}
 					s.setCoordinate(x1, y1, x2, y2);
-					if (!(closedList.containsKey(s.toString()) && !(openList.containsKey(s.toString())))) {
-//					if (c.get(s.toString())==null && h.get(s.toString())==null) {
-						if (s.equals(goal)) {
+//					if (!(closedList.containsKey(s.toString()) && !(openList.containsKey(s.toString())))) {
+					if (closedList.get(s.toString())==null && openList.get(s.toString())==null) {
+						if (s.isGoal(goal)) {
 							String move = s.getMove();
 							move = move.substring(0, move.indexOf('-'));
 							s.setMove(move);
 							s.setCount(count);
 							return s;
 						}
+						queue.add(s);
+						openList.put(s.toString(), s);
 					}
-					queue.add(s);
-					openList.put(s.toString(), s);
 				}
 			}
 		}

@@ -116,7 +116,7 @@ public class Ex1 {
 			break;
 		}
 		long endTime = System.nanoTime();
-		System.out.println("success!");
+		System.out.println("success!"); // Delete this from the submission file!
 		double totalTime = (endTime - startTime) / 1000000000.0;
 		String summary = summary(start, totalTime);
 		saveToFile(summary);

@@ -4,7 +4,7 @@ import java.util.PriorityQueue;
 public class A_star_search {
 	private static int[] row = { 0, 1, 0, -1 };
 	private static int[] col = { 1, 0, -1, 0 };
-	
+
 	public static State A_Star(State start, State goal, boolean withOpen) {
 		int count = 1;
 		PriorityQueue<State> queue = new PriorityQueue<State>(new State_Comperator());
@@ -15,12 +15,19 @@ public class A_star_search {
 		int iteration = 0;
 		while (!(queue.isEmpty())) {
 			iteration++;
+//			State node = queue.poll(); // maybe should use q.pool??
+//			openList.remove(node.toString());
+			if (withOpen) {
+				System.out.println("iteration " + iteration + " open list:\n");
+				for (String state : openList.keySet()) {
+					System.out.println(state);
+				}
+				System.out.println();
+//				System.out.println("iteration "+iteration+" open list:\n\n" + openList.keySet() + "\n");
+			}
 			State node = queue.poll(); // maybe should use q.pool??
 			openList.remove(node.toString());
-			if (withOpen) {
-				System.out.println("open list:\n\n" + openList.keySet() + "\n");
-			}
-			if (node.equals(goal)) { // what about the start node? it don't have "move" field for substring...
+			if (node.isGoal(goal)) { // what about the start node? it don't have "move" field for substring...
 				String move = node.getMove();
 				move = move.substring(0, move.indexOf('-'));
 				node.setMove(move);
@@ -61,12 +68,14 @@ public class A_star_search {
 					}
 					s.setCoordinate(x1, y1, x2, y2);
 					s.setIteration(iteration);
-					if (!(closedList.containsKey(s.toString()) && !(openList.containsKey(s.toString())))) {
+//					if (!(closedList.containsKey(s.toString()) && !(openList.containsKey(s.toString())))) {
+					if (closedList.get(s.toString()) == null && openList.get(s.toString()) == null) {
 						queue.add(s);
 						openList.put(s.toString(), s);
 					} else if (openList.containsKey(s.toString())) {
 						State old = openList.get(s.toString());
 						if (old.getCost() > s.getCost()) {
+//						if (old.f() > s.f()) {
 							queue.remove(old); // don't sure about that!!
 							openList.remove(old.toString());
 							queue.add(s);

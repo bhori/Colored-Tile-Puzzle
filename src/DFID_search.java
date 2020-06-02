@@ -25,7 +25,7 @@ public class DFID_search {
 		State result = null;
 		State cutOff = node.cutOff(node.getN(), node.getM()); // should update counter??
 		State fail = node.fail(node.getN(), node.getM());
-		if (node.equals(goal)) {
+		if (node.isGoal(goal)) {
 			String move = node.getMove();
 			move = move.substring(0, move.indexOf('-'));
 			node.setMove(move);

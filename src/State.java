@@ -119,14 +119,21 @@ public class State {
 		}
 		return fail;
 	}
-
+	
+	/** Returns a string representing the board of this state */
 	public String toString() {
 		String s = "";
 		for (int[] row : board)
 			s += Arrays.toString(row) + "\n";
 		return s;
 	}
-
+	
+	/**
+	 * Checks whether the operator is valid, which means it does not exceed out of board limits and does not move a black tile.
+	 * @param row - the row is given by the operator.
+	 * @param column - the column is given by the operator.
+	 * @return true if the operator is valid, otherwise return false.
+	 */
 	public boolean IsLegal(int row, int column) {
 		if (!(row >= 0 && row < n && column >= 0 && column < m))
 			return false;
@@ -134,7 +141,13 @@ public class State {
 			return false;
 		return true;
 	}
-
+	
+	/**
+	 * Checks whether the operator creates the parent state.
+	 * @param row - the row is given by the operator.
+	 * @param column - the column is given by the operator.
+	 * @return 'true' if the operator creates the parent state, otherwise return false.
+	 */
 	public boolean IsParent(int row, int column) {
 		int x =getX();
 		int y= getY();
@@ -146,51 +159,73 @@ public class State {
 		setCoordinate(row, column, x, y);
 		return false;
 	}
-
-//	public boolean allIsLegal(int row, int column) {
-//		for (int i = 0; i < 4; i++) {
-//			if(!(IsLegal(x+this.row[i], y+col[i])))
-//				return false;
-//		}
-//		return true;
-//	}
-
+	
+	/**
+	 * @return Number of rows in the board.
+	 */
 	public int getN() {
 		return n;
-	}
-
+	}	
+	
+	/**
+	 * @return Number of columns in the board
+	 */
 	public int getM() {
 		return m;
 	}
-
+	
+	/**
+	 * @return the x-coordinate (row) of the empty place ('_'/0).
+	 */
 	public int getX() {
 		return x;
 	}
-
+	
+	/**
+	 * @return the y-coordinate (column) of the empty place ('_'/0).
+	 */
 	public int getY() {
 		return y;
 	}
-
-	public void setX(int x) {
-		this.x = x;
-	}
-
-	public void setY(int y) {
-		this.y = y;
-	}
-
+	
+//	/**
+//	 * @param x - the new x-coordinate (row) of the empty place ('_'/0).
+//	 */
+//	public void setX(int x) {
+//		this.x = x;
+//	}
+//	
+//	/**
+//	 * @param y - the new y-coordinate (column) of the empty place ('_'/0).
+//	 */
+//	public void setY(int y) {
+//		this.y = y;
+//	}
+	
+	/**
+	 * @return the board of this state.
+	 */
 	public int[][] getBoard() {
 		return board;
 	}
-
+	
+	/**
+	 * @return the list of the black tiles.
+	 */
 	public ArrayList<Integer> getBlack() {
 		return black;
 	}
-
+	
+	/**
+	 * @return the list of the red tiles.
+	 */
 	public ArrayList<Integer> getRed() {
 		return red;
 	}
-
+	
+	/**
+	 * @return the parent of this state (the state in which the operator operated to reach this state).
+	 */
 	public State getParent() {
 		return parent;
 	}
@@ -263,9 +298,9 @@ public class State {
 		board[x][y] = value;
 	}
 	/**
-	 * 
-	 * @param x
-	 * @param y
+	 * Checks whether this tile is red.
+	 * @param x - the x-coordinate (row) of tile.
+	 * @param y - the y-coordinate (column) of tile.
 	 * @return true if board[x][y] is red, otherwise return false
 	 */
 	public boolean isRed(int x, int y) {
@@ -277,7 +312,12 @@ public class State {
 	public boolean isGoal(State goal) {
 		return equals(goal);
 	}
-
+	
+	/**
+	 * Checks whether the boards of this state and 's' are equal.
+	 * @param s - the state compared to this state.
+	 * @return true if the boards are equal, otherwise return false
+	 */
 	public boolean equals(State s) {
 		if (s == null)
 			return false; // what if "this" is null too???
@@ -290,7 +330,11 @@ public class State {
 		}
 		return true;
 	}
-
+	
+	/**
+	 * Computes the path from the start state to this state.
+	 * @return the path from the start state to this state.
+	 */
 	public String path() {
 		if (parent == null)
 			return move;

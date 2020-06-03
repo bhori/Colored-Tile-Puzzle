@@ -26,6 +26,7 @@ public class DFBnB_search {
 		stack.push(start);
 		h.put(start.toString(), start);
 		int t = Integer.MAX_VALUE;
+//		int t = 200;
 		int count = 1;
 		start.setCount(count);
 		State result = null;

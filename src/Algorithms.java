@@ -64,7 +64,7 @@ public class Algorithms {
 					} else {
 						s.setCost(node.getCost() + 1);
 					}
-					s.setCoordinate(x1, y1, x2, y2);
+					s.replace(x1, y1, x2, y2);
 //					if (node.getParent() != null && s.toString().equals(node.getParent().toString())) // s.toString()==node.getParent().toString()
 //						continue;
 //					count++;
@@ -169,7 +169,7 @@ public class Algorithms {
 					} else {
 						s.setCost(node.getCost() + 1);
 					}
-					s.setCoordinate(x1, y1, x2, y2);
+					s.replace(x1, y1, x2, y2);
 //					s.setCount(count);
 //					if (node.getParent() != null && s.toString().equals(node.getParent().toString())) // s.toString()==node.getParent().toString()
 //						continue;
@@ -257,7 +257,7 @@ public class Algorithms {
 					} else {
 						s.setCost(node.getCost() + 1);
 					}
-					s.setCoordinate(x1, y1, x2, y2);
+					s.replace(x1, y1, x2, y2);
 					s.setIteration(iteration);
 					if (!(closedList.containsKey(s.toString()) && !(openList.containsKey(s.toString())))) {
 						queue.add(s);
@@ -329,7 +329,7 @@ public class Algorithms {
 							} else {
 								s.setCost(node.getCost() + 1);
 							}
-							s.setCoordinate(x1, y1, x2, y2);
+							s.replace(x1, y1, x2, y2);
 //							int f = s.getCost()+s.heuristic();
 							if (s.f() > threshold) {
 								min = Math.min(min, s.f());
@@ -432,7 +432,7 @@ public class Algorithms {
 						} else {
 							s.setCost(node.getCost() + 1);
 						}
-						s.setCoordinate(x1, y1, x2, y2);
+						s.replace(x1, y1, x2, y2);
 						children.add(s);
 					}
 				}

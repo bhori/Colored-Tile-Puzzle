@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
 
 public class State {
 	private int[][] board; //Represents the board for this state
@@ -13,16 +12,22 @@ public class State {
 //	private Hashtable<Integer, Boolean> black;
 //	private Hashtable<Integer, Boolean> red;
 	private State parent;
-	private String move; //The step taken to reach this state
+	private String move; //The step is taken to reach this state
 	private int moveID=-1; //Value between 0-3, Indicates the direction of the step that created this state (0-left,1-up,2-right,3-down), useful for A*, IDA* and DFBnB for local priority ordering
 	private int count; //Holds the amount of vertices created up to this state
 	private int cost; //Holds the required cost up to this state
 	int iteration; //Holds the iteration in the algorithm that created this state, is used to sort vertices with equal f values, useful for A*, IDA* and DFBnB for priority ordering
 	int out; //for IDA* and DFBnB, 1 marks "out" 
-	private int[] row = { 0, -1, 0, 1 };
-	private int[] col = { -1, 0, 1, 0 };
 
-	/** Constructor for the initial state */
+//	/** Constructor for the initial state */
+	/**
+	 * Constructor for the initial state
+	 * @param n the number of rows in the board.
+	 * @param m the number of columns in the board.
+	 * @param start list of the numbers by their location in the board.
+	 * @param black list of the black tiles in the board.
+	 * @param red list of the red tiles in the board.
+	 */
 	public State(int n, int m, int[] start, ArrayList<Integer> black, ArrayList<Integer> red) {
 		board = new int[n][m];
 		this.n = n;
@@ -54,7 +59,11 @@ public class State {
 		}
 	}
 
-	/** Copy constructor */
+//	/** Copy constructor */
+	/**
+	 * Copy constructor
+	 * @param other - the copied state.
+	 */
 	public State(State other) { // Init parent?
 		parent = other.getParent();
 		move = ""; // don't sure about that!!
@@ -62,7 +71,7 @@ public class State {
 		m = other.getM();
 		x = other.getX();
 		y = other.getY();
-		out=out;
+		out=0;
 		board = new int[n][m];
 		int[][] temp = other.getBoard();
 		for (int i = 0; i < temp.length; i++) {
@@ -81,7 +90,12 @@ public class State {
 		}
 	}
 
-	/** Constructor for the goal state */
+//	/** Constructor for the goal state */
+	/**
+	 * Constructor for the goal state
+	 * @param n - the number of rows in the board.
+	 * @param m - the number of columns in the board.
+	 */
 	public State(int n, int m) {
 		parent = null;
 		move = "";
@@ -101,7 +115,7 @@ public class State {
 		State cutOff = new State(n,m);
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
-				cutOff.setValue(i, j, 0);
+				cutOff.setCoordinate(i, j, 0);
 //				cutOff.getboard()[i][j]=0;		
 //				board[i][j] = i * m + j + 1;
 			}
@@ -113,7 +127,7 @@ public class State {
 		State fail = new State(n,m);
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
-				fail.setValue(i, j, -1);
+				fail.setCoordinate(i, j, -1);
 //				board[i][j] = i * m + j + 1;
 			}
 		}
@@ -132,7 +146,7 @@ public class State {
 	 * Checks whether the operator is valid, which means it does not exceed out of board limits and does not move a black tile.
 	 * @param row - the row is given by the operator.
 	 * @param column - the column is given by the operator.
-	 * @return true if the operator is valid, otherwise return false.
+	 * @return true if the operator is valid, else return false.
 	 */
 	public boolean IsLegal(int row, int column) {
 		if (!(row >= 0 && row < n && column >= 0 && column < m))
@@ -146,18 +160,34 @@ public class State {
 	 * Checks whether the operator creates the parent state.
 	 * @param row - the row is given by the operator.
 	 * @param column - the column is given by the operator.
-	 * @return 'true' if the operator creates the parent state, otherwise return false.
+	 * @return 'true' if the operator creates the parent state, else return false.
 	 */
 	public boolean IsParent(int row, int column) {
 		int x =getX();
 		int y= getY();
-		setCoordinate(x, y, row, column);
+		replace(x, y, row, column);
 		if (equals(getParent())) {
-			setCoordinate(row, column, x, y);
+			replace(row, column, x, y);
 			return true;
 		}
-		setCoordinate(row, column, x, y);
+		replace(row, column, x, y);
 		return false;
+	}
+	
+	/**
+	 * Checks whether all black tiles are in the right place, otherwise there is no solution to the game for this state.
+	 * @return true if all black tiles are in the right place, else return false.
+	 */
+	public boolean blackInPlace() {
+		if(black.size()==0)
+			return true;
+		for (Integer tile_number : black) {
+			int targetX = (tile_number - 1) / m; // expected x-coordinate (row)
+            int targetY = (tile_number - 1) % m; // expected y-coordinate (col)
+            if(board[targetX][targetY]!=tile_number)
+            	return false;
+		}
+		return true;
 	}
 	
 	/**
@@ -230,14 +260,25 @@ public class State {
 		return parent;
 	}
 
+	/**
+	 * Updates the parent of this state (the state in which the operator operated to reach this state).
+	 * @param parent - the parent of this state.
+	 */
 	public void setParent(State parent) {
 		this.parent = parent;
 	}
 
+	/**
+	 * @return the step is taken to reach this state.
+	 */
 	public String getMove() {
 		return move;
 	}
 
+	/**
+	 * Updates the step is taken to reach this state.
+	 * @param move
+	 */
 	public void setMove(String move) {
 		this.move = move;
 	}
@@ -250,18 +291,32 @@ public class State {
 		this.moveID = moveID;
 	}
 
+	/**
+	 * @return the cost of the path up to this state.
+	 */
 	public int getCost() {
 		return cost;
 	}
-	
+
+	/**
+	 * Updates the cost of the path up to this state.
+	 * @param cost - the cost of the path up to this state.
+	 */
 	public void setCost(int cost) {
 		this.cost = cost;
 	}
 
+	/**
+	 * @return the number of vertices produced up to this state.
+	 */
 	public int getCount() {
 		return count;
 	}
 
+	/**
+	 * Updates the number of vertices produced up to this state.
+	 * @param count - the number of vertices produced up to this state.
+	 */
 	public void setCount(int count) {
 		this.count = count;
 	}
@@ -282,11 +337,34 @@ public class State {
 		this.out = out;
 	}
 
+	/**
+	 * Return the number in the board that is in the place of the received coordinates.
+	 * @param x - the x-coordinate (row).
+	 * @param y - the y-coordinate (column).
+	 * @return the number in the board that is in the place of the received coordinates.
+	 */
 	public int getCoordinate(int x, int y) {
 		return board[x][y];
 	}
 
-	public void setCoordinate(int x1, int y1, int x2, int y2) {
+	/**
+	 * Updates the value found in the board in the received coordinates with the given value.
+	 * @param x - the x-coordinate (row).
+	 * @param y - the y-coordinate (column).
+	 * @param value - the new value in the board in the given coordinates. 
+	 */
+	public void setCoordinate(int x, int y, int value) { // maybe it is better to overload setCoordinate..
+		board[x][y] = value;
+	}
+
+	/**
+	 * Replaces the value in the board at position x1,y1 with the value at position x2,y2.
+	 * @param x1 - the x-coordinate of the first position (row).
+	 * @param y1 - the y-coordinate of the first position (column).
+	 * @param x2 - the x-coordinate of the second position (row).
+	 * @param y2 - the y-coordinate of the second position (column).
+	 */
+	public void replace(int x1, int y1, int x2, int y2) {
 		int tmp = board[x1][y1];
 		board[x1][y1] = board[x2][y2];
 		board[x2][y2] = tmp;
@@ -294,9 +372,6 @@ public class State {
 		y = y2;
 	}
 	
-	public void setValue(int x, int y, int value) { // maybe it is better to overload setCoordinate..
-		board[x][y] = value;
-	}
 	/**
 	 * Checks whether this tile is red.
 	 * @param x - the x-coordinate (row) of tile.
@@ -309,6 +384,11 @@ public class State {
 		return false;
 	}
 	
+	/**
+	 * Checks whether this is the goal state.
+	 * @param goal - the goal state.
+	 * @return true if this is the goal state, else return false.
+	 */
 	public boolean isGoal(State goal) {
 		return equals(goal);
 	}

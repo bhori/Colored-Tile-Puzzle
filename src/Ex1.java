@@ -13,7 +13,7 @@ import java.util.Scanner;
 public class Ex1 {
 	private static boolean withOpen = false, withTime = false, blacks = false, reds = false;
 
-	public static String summary(State n, double totalTime) {
+	private static String summary(State n, double totalTime) {
 		String path = n.path();
 		String num = "Num: " + n.getCount();
 		String value = "Cost: " + n.getCost();
@@ -26,7 +26,7 @@ public class Ex1 {
 		return path + "\n" + num + "\n" + value + "\n" + time;
 	}
 
-	public static void saveToFile(String summary) throws IOException {
+	private static void saveToFile(String summary) throws IOException {
 		try {
 			PrintWriter pw = new PrintWriter("output.txt");
 			pw.write(summary);
@@ -36,7 +36,7 @@ public class Ex1 {
 		}
 	}
 
-	public static State readInput() throws FileNotFoundException {
+	private static State readInput() throws FileNotFoundException {
 		Scanner in = new Scanner(new FileReader("input.txt")); // maybe i need to write "/input.txt" with "/"
 		in.nextLine(); //To skip the line of the algorithm type, this is already known in main
 		String time = in.nextLine();

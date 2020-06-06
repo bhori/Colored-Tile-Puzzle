@@ -7,6 +7,10 @@ public class DFID_search {
 
 	public static State DFID(State start, State goal) throws IOException {
 		start.setCount(1);
+		if (!start.blackInPlace()) {
+			start.setMove("no path");
+			return start;
+		}
 		State cutOff = start.cutOff(start.getN(), start.getM()); // should update counter??
 		State result = null;
 		for (int depth = 1; depth < Integer.MAX_VALUE; depth++) {
@@ -66,7 +70,7 @@ public class DFID_search {
 					} else {
 						s.setCost(node.getCost() + 1);
 					}
-					s.setCoordinate(x1, y1, x2, y2);
+					s.replace(x1, y1, x2, y2);
 					if (h.containsKey(s.toString()))
 						continue;
 					result = limitedDFS(s, goal, limit - 1, h);

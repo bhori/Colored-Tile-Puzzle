@@ -6,28 +6,51 @@ public class DFBnB_search {
 	private static int[] row = { 0, 1, 0, -1 };
 	private static int[] col = { 1, 0, -1, 0 };
 
-	private static void removeFromStack(Stack<State> stack, State state) {
-		Stack<State> tmp = new Stack<State>();
-		while (!(stack.isEmpty())) {
-			State s = (State) stack.pop();
-			if (s.equals(state))
-				break;
-			tmp.push(s);
+	/**
+	 * Computes the number of tiles in the board that are not black (excluding the empty tile), used for the initial threshold.
+	 * @param start - the start state of the game.
+	 * @return the number of tiles in the board that are not black (excluding the empty tile).
+	 */
+	private static int numberOfTiles(State start) {
+		int[][] board = start.getBoard();
+		int tiles = 0;
+		for (int i = 0; i < board.length; i++) {
+			for (int j = 0; j < board[0].length; j++) {
+				if ((board[i][j] != 0) && !(start.getBlack().contains(board[i][j]))) {
+					tiles++;
+				}
+			}
 		}
-		while (!(tmp.isEmpty())) {
-			stack.push(tmp.pop());
-		}
+		return tiles;
+	}
 
+	/**
+	 * Computes the factorial of the number of tiles in the board that are not black (excluding the empty tile), used for the initial threshold.
+	 * @param tilesNumber - the number of tiles in the board that are not black (excluding the empty tile).
+	 * @return the factorial of tilesNumber.
+	 */
+	private static int factorial(int tilesNumber) {
+		int res = 1, i;
+		for (i = 2; i <= tilesNumber; i++)
+			res *= i;
+		return res;
 	}
 
 	public static State DFBnB(State start, State goal) {
+		int count = 1;
+		if (!start.blackInPlace()) {
+			start.setMove("no path");
+			start.setCount(count);
+			return start;
+		}
 		Stack<State> stack = new Stack<State>();
 		Hashtable<String, State> h = new Hashtable<String, State>();
 		stack.push(start);
 		h.put(start.toString(), start);
-		int t = Integer.MAX_VALUE;
+		int tilesNumber = numberOfTiles(start);
+		int t = Math.min(factorial(tilesNumber), Integer.MAX_VALUE);
 //		int t = 200;
-		int count = 1;
+//		int count = 1;
 		start.setCount(count);
 		State result = null;
 		while (!(stack.isEmpty())) {
@@ -69,28 +92,28 @@ public class DFBnB_search {
 						} else {
 							s.setCost(node.getCost() + 1);
 						}
-						s.setCoordinate(x1, y1, x2, y2);
+						s.replace(x1, y1, x2, y2);
 						children.add(s);
 					}
 				}
 				State_Comperator sort = new State_Comperator();
 				children.sort(sort);
-				for (int i=0;i<children.size();i++) {
+				for (int i = 0; i < children.size(); i++) {
 					State state = children.get(i);
 					if (state.f() >= t) {
 						while (i < children.size())
 							children.remove(i);
 //					} else if (h.containsKey(state.toString())) {
-					} else if (h.get(state.toString())!=null) {
+					} else if (h.get(state.toString()) != null) {
 						State old = h.get(state.toString());
 						if (old.getOut() == 1) {
 							children.remove(state);
+							i--;
 						} else {
 							if (old.f() <= state.f()) {
 								children.remove(state);
+								i--;
 							} else {
-								removeFromStack(stack, old); //this function is neccesary? maybe pop is enough...
-//								stack.pop();
 								stack.remove(old);
 								h.remove(old.toString());
 							}

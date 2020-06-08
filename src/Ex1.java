@@ -15,15 +15,17 @@ public class Ex1 {
 
 	private static String summary(State n, double totalTime) {
 		String path = n.path();
-		String num = "Num: " + n.getCount();
-		String value = "Cost: " + n.getCost();
+		String numOfStates = "Num: " + n.getCount();
+		String cost = "Cost: " + n.getCost();
 		String time = "";
-		if (withTime)
-			time = new DecimalFormat("0.000").format(totalTime) + " seconds";
 		if (path.equals("no path"))
-			return path + "\n" + num;
+			return path + "\n" + numOfStates;
 //		String value = "Cost: " + n.getCost();
-		return path + "\n" + num + "\n" + value + "\n" + time;
+		if (withTime) {
+			time = new DecimalFormat("0.000").format(totalTime) + " seconds";
+			return path + "\n" + numOfStates + "\n" + cost + "\n" + time;
+		}
+		return path + "\n" + numOfStates + "\n" + cost;
 	}
 
 	private static void saveToFile(String summary) throws IOException {
@@ -32,7 +34,7 @@ public class Ex1 {
 			pw.write(summary);
 			pw.close();
 		} catch (IOException e) {
-			throw new IOException("ERR:can't write in file: saveToFile");
+			e.printStackTrace();
 		}
 	}
 
@@ -93,33 +95,58 @@ public class Ex1 {
 		String algo = in.nextLine();
 		in.close();
 		State start = readInput();
-		State goal = new State(start.getN(), start.getM());
+		State goal = start.goal();
+//		State goal = new State(start.getN(), start.getM());
 		long startTime = System.nanoTime();
-		switch (algo) {
-		case "BFS":
-			start = BFS_search.BFS(start, goal, withOpen);
-			break;
-		case "DFID":
-			start = DFID_search.DFID(start, goal);
-			break;
-		case "A*":
-			start = A_star_search.A_Star(start, goal, withOpen);
-			break;
-		case "IDA*":
-			start = IDA_star_search.IDA_Star(start, goal);
-			break;
-		case "DFBnB":
-			start = DFBnB_search.DFBnB(start, goal);
-			break;
-
-		default:
-			break;
-		}
+		Solver solver = new Solver(algo);
+		start = solver.solve(start, goal);
 		long endTime = System.nanoTime();
 		System.out.println("success!"); // Delete this from the submission file!
 		double totalTime = (endTime - startTime) / 1000000000.0;
 		String summary = summary(start, totalTime);
 		saveToFile(summary);
 	}
+	
+	
+//	switch (algo) {
+//	case "BFS":
+//		start = BFS_search.BFS(start, goal, withOpen);
+//		break;
+//	case "DFID":
+//		start = DFID_search.DFID(start, goal);
+//		break;
+//	case "A*":
+//		start = A_star_search.A_Star(start, goal, withOpen);
+//		break;
+//	case "IDA*":
+//		start = IDA_star_search.IDA_Star(start, goal);
+//		break;
+//	case "DFBnB":
+//		start = DFBnB_search.DFBnB(start, goal);
+//		break;
+//
+//	default:
+//		break;
+//	}
+/*		**************** */
+//	switch (algo) {
+//	case "BFS":
+//		start = Algorithms.BFS(start, goal, withOpen);
+//		break;
+//	case "DFID":
+//		start = Algorithms.DFID(start, goal);
+//		break;
+//	case "A*":
+//		start = Algorithms.A_Star(start, goal, withOpen);
+//		break;
+//	case "IDA*":
+//		start = Algorithms.IDA_Star(start, goal);
+//		break;
+//	case "DFBnB":
+//		start = Algorithms.DFBnB(start, goal);
+//		break;
+//	default:
+//		break;
+//	}
 
 }

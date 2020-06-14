@@ -2,115 +2,24 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.PriorityQueue;
 
+/**
+ * This class represents a A* algorithm, in this implementation to improve the search we used closed list and open list for loop-avoidance.
+ * This class implements the search_algorithm interface.
+ * @author Ori Ben-Hamo
+ *
+ */
 public class A_star_search implements search_algorithm{
-	private static int[] row = { 0, 1, 0, -1 };
-	private static int[] col = { 1, 0, -1, 0 };
+	private SearchInfo info;
 
-	public static State A_Star(State start, State goal, boolean withOpen) {
-		int count = 1;
-		if (start.blackInPlace()) {
-			PriorityQueue<State> queue = new PriorityQueue<State>(new State_Comperator());
-			Hashtable<String, State> openList = new Hashtable<String, State>();
-			queue.add(start);
-			openList.put(start.toString(), start);
-			Hashtable<String, State> closedList = new Hashtable<String, State>();
-			int iteration = 0;
-			while (!(queue.isEmpty())) {
-				iteration++;
-				if (withOpen) {
-					System.out.println("iteration " + iteration + " open list:\n");
-					for (String state : openList.keySet()) {
-						System.out.println(state);
-					}
-					System.out.println();
-				}
-				State node = queue.poll();
-				openList.remove(node.toString());
-				if (node.isGoal(goal)) { // what about the start node? it don't have "move" field for substring...
-					String move = node.getMove();
-					move = move.substring(0, move.indexOf('-'));
-					node.setMove(move);
-					node.setCount(count);
-					return node;
-				}
-				closedList.put(node.toString(), node);
-				ArrayList<State> children = node.createChildren();
-				for (int i = 0; i < children.size(); i++) {
-					State son = children.get(i);
-					count++;
-					son.setIteration(iteration);
-					if (closedList.get(son.toString()) == null && openList.get(son.toString()) == null) {
-						queue.add(son);
-						openList.put(son.toString(), son);
-					} else if (openList.containsKey(son.toString())) {
-						State old = openList.get(son.toString());
-						if (old.getCost() > son.getCost()) {
-							queue.remove(old); // don't sure about that!!
-							openList.remove(old.toString());
-							queue.add(son);
-							openList.put(son.toString(), son);
-						}
-					}
-				}
-//				for (int i = 0; i < 4; i++) {
-//					int x1 = node.getX();
-//					int y1 = node.getY();
-//					int x2 = x1 + row[i];
-//					int y2 = y1 + col[i];
-//					if (node.IsLegal(x2, y2) && !(node.IsParent(x2, y2))) {
-//						State s = new State(node);
-//						count++;
-//						s.setParent(node);
-//						switch (i) {
-//						case 0:
-//							s.setMove(s.getCoordinate(x2, y2) + "L-");
-//							break;
-//						case 1:
-//							s.setMove(s.getCoordinate(x2, y2) + "U-");
-//							break;
-//						case 2:
-//							s.setMove(s.getCoordinate(x2, y2) + "R-");
-//							break;
-//						case 3:
-//							s.setMove(s.getCoordinate(x2, y2) + "D-");
-//							break;
-//						default:
-//							break;
-//						}
-//						s.setMoveID(i);
-//						if (s.isRed(x2, y2)) {
-//							s.setCost(node.getCost() + 30);
-//						} else {
-//							s.setCost(node.getCost() + 1);
-//						}
-//						s.replace(x1, y1, x2, y2);
-//						s.setIteration(iteration);
-//						if (closedList.get(s.toString()) == null && openList.get(s.toString()) == null) {
-//							queue.add(s);
-//							openList.put(s.toString(), s);
-//						} else if (openList.containsKey(s.toString())) {
-//							State old = openList.get(s.toString());
-//							if (old.getCost() > s.getCost()) {
-//								queue.remove(old); // don't sure about that!!
-//								openList.remove(old.toString());
-//								queue.add(s);
-//								openList.put(s.toString(), s);
-//							}
-//						}
-//					}
-//				}
-			}
-		}
-		start.setMove("no path");
-		start.setCount(count);
-		return start;
-	}
-
+	/**
+	 * Run the search on the given game and returns its result.
+	 */
 	@Override
-	public State solve(State start, State goal) {
+	public SearchInfo solve(State start, State goal, boolean withOpen) {
 		int count = 1;
+		info = new SearchInfo(start, count);
 		if (start.blackInPlace()) {
-			PriorityQueue<State> queue = new PriorityQueue<State>(new State_Comperator());
+			PriorityQueue<State> queue = new PriorityQueue<State>(new State_Comparator());
 			Hashtable<String, State> openList = new Hashtable<String, State>();
 			queue.add(start);
 			openList.put(start.toString(), start);
@@ -118,21 +27,16 @@ public class A_star_search implements search_algorithm{
 			int iteration = 0;
 			while (!(queue.isEmpty())) {
 				iteration++;
-//				if (withOpen) {
-//					System.out.println("iteration " + iteration + " open list:\n");
-//					for (String state : openList.keySet()) {
-//						System.out.println(state);
-//					}
-//					System.out.println();
-//				}
+				if (withOpen)
+					printOpenList(openList);
 				State node = queue.poll();
 				openList.remove(node.toString());
 				if (node.isGoal(goal)) { // what about the start node? it don't have "move" field for substring...
 					String move = node.getMove();
 					move = move.substring(0, move.indexOf('-'));
 					node.setMove(move);
-					node.setCount(count);
-					return node;
+					info = new SearchInfo(node, count);
+					return info;
 				}
 				closedList.put(node.toString(), node);
 				ArrayList<State> children = node.createChildren();
@@ -155,8 +59,20 @@ public class A_star_search implements search_algorithm{
 				}
 			}
 		}
-		start.setMove("no path");
-		start.setCount(count);
-		return start;
+		info.setPath("no path");
+		info.setNumOfStates(count);
+		return info;
 	}
+	
+	/**
+	 * Prints the open list.
+	 * @param openList the required list to be printed.
+	 */
+	private void printOpenList(Hashtable<String, State> openList) {
+		for (String state : openList.keySet()) {
+			System.out.println(state);
+		}
+		System.out.println("**************************");
+	}
+
 }

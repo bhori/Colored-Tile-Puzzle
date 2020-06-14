@@ -1,7 +1,17 @@
 
+/**
+ * This class is responsible for managing the game which includes running the appropriate algorithm and returning the result of the game.
+ * @author Ori Ben-Hamo
+ *
+ */
 public class Solver {
 	private search_algorithm algo;
+	private SearchInfo info;
 	
+	/**
+	 * Constructor for selecting the requested algorithm for the gameõ
+	 * @param algo the requested algorithm for the game.
+	 */
 	public Solver(String algo) {
 		switch (algo) {
 		case "BFS":
@@ -24,8 +34,24 @@ public class Solver {
 		}
 	}
 	
-	public State solve(State start, State goal){
-		return algo.solve(start, goal);
+	/**
+	 * Runs the game and returns its result.
+	 * @param start the initial state of the game.
+	 * @param goal the goal state of the game.
+	 * @param withOpen indicates whether to print the open list in each iteration of the algorithm.
+	 * @return the result of the game.
+	 */
+	public SearchInfo solve(State start, State goal, boolean withOpen){
+//		if(algo instanceof BFS_search)
+//			BFS_search.setWithOpen(withOpen);
+//		if(algo instanceof A_star_search)
+//			A_star_search.setWithOpen(withOpen);
+		long startTime = System.nanoTime();
+		info = algo.solve(start, goal, withOpen);
+		long endTime = System.nanoTime();
+		double totalTime = (endTime - startTime) / 1000000000.0;
+		info.setTime(totalTime);
+		return info;
 	}
 
 }

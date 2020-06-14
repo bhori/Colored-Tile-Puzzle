@@ -1,33 +1,106 @@
 import java.util.Hashtable;
 
+/**
+ * This class represents a recursive DFID algorithm with loop-avoidance.
+ * Note that the algorithm does not necessarily find the cheapest path but rather finds the shortest path.
+ * This class implements the search_algorithm interface.
+ * @author Ori Ben-Hamo
+ *
+ */
 public class DFID_search implements search_algorithm{
+	private SearchInfo info;
 	private State cutOff;
 	private State fail;
 	static int count = 1; // this is good???
 	
-	private State limitedDFS(State node, State goal, int limit, Hashtable<String, State> h) {
+	/**
+	 * Creates cutOff state, i.e. all tiles are '0'.
+	 * @param start the state from which the cutOff state is produced.
+	 * @return cutOff state.
+	 */
+	public State cutOff(State start) {
+		State cutOff = new State(start);
+		int n = cutOff.getBoard().length;
+		int m= cutOff.getBoard()[0].length;
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				cutOff.setCoordinate(i, j, 0);
+			}
+		}
+		return cutOff;
+	}
+
+	/**
+	 * Creates fail state, i.e. all tiles are '-1'.
+	 * @param start the state from which the fail state is produced.
+	 * @return fail state.
+	 */
+	public State fail(State start) {
+		State fail = new State(start);
+		int n = fail.getBoard().length;
+		int m= fail.getBoard()[0].length;
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				fail.setCoordinate(i, j, -1);
+			}
+		}
+		return fail;
+	}
+	
+	/**
+	 * Run the search on the given game and returns its result.
+	 */
+	@Override
+	public SearchInfo solve(State start, State goal, boolean withOpen) {
+		start.setCount(1);
+		if (!start.blackInPlace()) {
+			start.setMove("no path");
+			info = new SearchInfo(start, count);
+			return info;
+		}
+		cutOff = cutOff(start);
+		fail = fail(start);
+		State result = null;
+		for (int depth = 1; depth < Integer.MAX_VALUE; depth++) {
+			Hashtable<String, State> openList = new Hashtable<String, State>();
+			result = limitedDFS(start, goal, depth, openList, withOpen);
+			if (!(result.equals(cutOff))) {
+				info = new SearchInfo(result, count);
+				return info;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Recursive DFS algorithm that is limited in the depth of the search.
+	 * @param current the state we are comparing to the goal state or going to expand.
+	 * @param goal the goal state.
+	 * @param limit the limit of the depth of the search.
+	 * @param openList the open list.
+	 * @return the goal state if reached, cutOff if reached limit, fail if the goal state is not found
+	 */
+	private State limitedDFS(State current, State goal, int limit, Hashtable<String, State> openList, boolean withOpen) {
 		boolean isCutOff;
 		State result = null;
-//		State cutOff = node.cutOff(node.getN(), node.getM()); // should update counter??
-		fail = node.fail();
-		if (node.isGoal(goal)) {
-			String move = node.getMove();
+		if (current.isGoal(goal)) {
+			String move = current.getMove();
 			move = move.substring(0, move.indexOf('-'));
-			node.setMove(move);
-			return node;
+			current.setMove(move);
+			return current;
 		} else if (limit == 0) {
 			return cutOff;
 		} else {
-			h.put(node.toString(), node);
+			openList.put(current.toString(), current);
 			isCutOff = false;
 			for (int i = 0; i < 4; i++) {
-				State son = node.createSon(i);
+				State son = current.createSon(i);
 				if (son != null) {
 					count++;
 					son.setCount(count);
-					if (h.containsKey(son.toString()))
+					if (openList.containsKey(son.toString()))
 						continue;
-					result = limitedDFS(son, goal, limit - 1, h);
+					result = limitedDFS(son, goal, limit - 1, openList, withOpen);
 					if (result.equals(cutOff)) {
 						isCutOff = true;
 					} else if (!(result.equals(fail))) {
@@ -35,7 +108,9 @@ public class DFID_search implements search_algorithm{
 					}
 				}
 			}
-			h.remove(node.toString());
+			if (withOpen)
+				printOpenList(openList);
+			openList.remove(current.toString());
 			if (isCutOff) {
 				return cutOff;
 			} else {
@@ -46,81 +121,15 @@ public class DFID_search implements search_algorithm{
 		}
 	}
 
-	@Override
-	public State solve(State start, State goal) {
-		start.setCount(1);
-		if (!start.blackInPlace()) {
-			start.setMove("no path");
-			return start;
+	/**
+	 * Prints the open list.
+	 * @param openList the required list to be printed.
+	 */
+	private void printOpenList(Hashtable<String, State> openList) {
+		for (String state : openList.keySet()) {
+			System.out.println(state);
 		}
-		cutOff = start.cutOff(); // should update counter??
-		State result = null;
-		for (int depth = 1; depth < Integer.MAX_VALUE; depth++) {
-			Hashtable<String, State> h = new Hashtable<String, State>();
-			result = limitedDFS(start, goal, depth, h);
-			if (!(result.equals(cutOff)))
-				return result;
-		}
-		return null;
+		System.out.println("**************************");
 	}
-	
-//	public static State DFID(State start, State goal) throws IOException {
-//	start.setCount(1);
-//	if (!start.blackInPlace()) {
-//		start.setMove("no path");
-//		return start;
-//	}
-//	State cutOff = start.cutOff(start.getN(), start.getM()); // should update counter??
-//	State result = null;
-//	for (int depth = 1; depth < Integer.MAX_VALUE; depth++) {
-//		Hashtable<String, State> h = new Hashtable<String, State>();
-//		result = limitedDFS(start, goal, depth, h);
-//		if (!(result.equals(cutOff)))
-//			return result;
-//	}
-//	return null;
-//}
-	
-	/** part of old version of limited_dfs **/
-//	int x1 = node.getX();
-//	int y1 = node.getY();
-//	int x2 = x1 + row[i];
-//	int y2 = y1 + col[i];
-//	if (node.IsLegal(x2, y2) && !(node.IsParent(x2, y2))) {
-//		State s = new State(node);
-//		count++;
-//		s.setCount(count);
-//		s.setParent(node);
-//		switch (i) {
-//		case 0:
-//			s.setMove(s.getCoordinate(x2, y2) + "L-");
-//			break;
-//		case 1:
-//			s.setMove(s.getCoordinate(x2, y2) + "U-");
-//			break;
-//		case 2:
-//			s.setMove(s.getCoordinate(x2, y2) + "R-");
-//			break;
-//		case 3:
-//			s.setMove(s.getCoordinate(x2, y2) + "D-");
-//			break;
-//		default:
-//			break;
-//		}
-//		if (s.isRed(x2, y2)) {
-//			s.setCost(node.getCost() + 30);
-//		} else {
-//			s.setCost(node.getCost() + 1);
-//		}
-//		s.replace(x1, y1, x2, y2);
-//		if (h.containsKey(s.toString()))
-//			continue;
-//		result = limitedDFS(s, goal, limit - 1, h);
-//		if (result.equals(cutOff)) {
-//			isCutOff = true;
-//		} else if (!(result.equals(fail))) {
-//			return result;
-//		}
-//	}
 
 }

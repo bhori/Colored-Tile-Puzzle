@@ -18,6 +18,11 @@ public class SearchInfo {
 		cost = goal.getCost();
 	}
 	
+	/**
+	 * Find the path of the game.
+	 * @param goal the last state in the game.
+	 * @return the path from the initial state to the 'goal'.
+	 */
 	private String path(State goal) {
 		if (goal.getParent() == null || goal.getMove().equals("no path"))
 			return goal.getMove();
@@ -41,29 +46,49 @@ public class SearchInfo {
 		return path + "\n" + StatesNumber + "\n" + totalCost;
 	}
 	
+	/**
+	 * @return the path of the game.
+	 */
 	public String getPath() {
 		return path;
 	}
+	
+	/**
+	 * Updates the path of the game.
+	 * @param path the new path.
+	 */
 	public void setPath(String path) {
 		this.path = path;
 	}
-	public int getNumOfStates() {
-		return numOfStates;
-	}
+	
+	/**
+	 * Updates the number of states which generated.
+	 * @param numOfStates the number of states which generated.
+	 */
 	public void setNumOfStates(int numOfStates) {
 		this.numOfStates = numOfStates;
 	}
+	
+	/**
+	 * @return the cost of the path.
+	 */
 	public int getCost() {
 		return cost;
 	}
+	
+	/**
+	 * Updates the of the path.
+	 * @param cost
+	 */
 	public void setCost(int cost) {
 		this.cost = cost;
 	}
-	public double getTime() {
-		return time;
-	}
+	
+	/**
+	 * Updates the time it took for the game.
+	 * @param time the time it took for the game.
+	 */
 	public void setTime(double time) {
 		this.time = time;
 	}
-
 }

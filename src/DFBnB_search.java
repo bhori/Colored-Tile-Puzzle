@@ -1,7 +1,12 @@
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Stack;
-
+/**
+ * This class represents a DFBnB algorithm with loop-avoidance.
+ * This class implements the search_algorithm interface.
+ * @author Ori Ben-Hamo
+ *
+ */
 public class DFBnB_search implements search_algorithm{
 	private SearchInfo info;
 

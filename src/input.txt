@@ -1,6 +1,6 @@
 A*
 with time
-no open
+with open
 3x4
 Black:
 Red: 11

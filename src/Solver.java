@@ -9,7 +9,7 @@ public class Solver {
 	private SearchInfo info;
 	
 	/**
-	 * Constructor for selecting the requested algorithm for the gameõ
+	 * Constructor for selecting the requested algorithm for the game
 	 * @param algo the requested algorithm for the game.
 	 */
 	public Solver(String algo) {
@@ -42,10 +42,6 @@ public class Solver {
 	 * @return the result of the game.
 	 */
 	public SearchInfo solve(State start, State goal, boolean withOpen){
-//		if(algo instanceof BFS_search)
-//			BFS_search.setWithOpen(withOpen);
-//		if(algo instanceof A_star_search)
-//			A_star_search.setWithOpen(withOpen);
 		long startTime = System.nanoTime();
 		info = algo.solve(start, goal, withOpen);
 		long endTime = System.nanoTime();

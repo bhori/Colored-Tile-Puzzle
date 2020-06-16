@@ -11,7 +11,7 @@ public class DFID_search implements search_algorithm{
 	private SearchInfo info;
 	private State cutOff;
 	private State fail;
-	static int count = 1; // this is good???
+	static int count = 1;
 	
 	/**
 	 * Creates cutOff state, i.e. all tiles are '0'.

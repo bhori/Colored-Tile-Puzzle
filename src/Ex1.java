@@ -6,10 +6,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
+/**
+ * This class represents the game Colored-NxM-tile puzzle, this game has an NxM board with
+ * numbers from 1 to N * M-1 and one blank, each non-empty tile has a color - red, green or black.
+ * The tiles are arranged in some initial order and the goal in this game is to find the cheapest number of actions that result from the initial order to the final arrangement,
+ * in the goal state all numbers are arranged from 1 to N * M-1 from left to right and bottom-up when the empty tile is in the lower right corner of the board.
+ * Black tiles cannot be moved, sliding red tiles cost 30, and green tiles cost 1.
+ * @author Ori Ben-Hamo
+ *
+ */
 public class Ex1 {
 	static boolean withOpen = false, withTime = false;
 	static String algo;
 
+	/**
+	 * Reads the input of the game from a file.
+	 * @return the initial state of the game.
+	 * @throws FileNotFoundException
+	 */
 	private static State readInput() throws FileNotFoundException {
 		Scanner in = new Scanner(new FileReader("input.txt"));
 		algo = in.nextLine();
@@ -60,6 +74,11 @@ public class Ex1 {
 		return start;
 	}
 	
+	/**
+	 * Writes the output to a file.
+	 * @param summary summary of the results of the game.
+	 * @throws IOException
+	 */
 	private static void saveToFile(String summary) throws IOException {
 		try {
 			PrintWriter pw = new PrintWriter("output.txt");

@@ -31,7 +31,7 @@ public class A_star_search implements search_algorithm{
 					printOpenList(openList);
 				State node = queue.poll();
 				openList.remove(node.toString());
-				if (node.isGoal(goal)) { // what about the start node? it don't have "move" field for substring...
+				if (node.isGoal(goal)) {
 					String move = node.getMove();
 					move = move.substring(0, move.indexOf('-'));
 					node.setMove(move);
@@ -50,7 +50,7 @@ public class A_star_search implements search_algorithm{
 					} else if (openList.containsKey(son.toString())) {
 						State old = openList.get(son.toString());
 						if (old.getCost() > son.getCost()) {
-							queue.remove(old); // don't sure about that!!
+							queue.remove(old);
 							openList.remove(old.toString());
 							queue.add(son);
 							openList.put(son.toString(), son);

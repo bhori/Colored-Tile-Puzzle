@@ -368,7 +368,7 @@ public class State {
 	 * @param y     - the y-coordinate (column).
 	 * @param value - the new value in the board in the given coordinates.
 	 */
-	public void setCoordinate(int x, int y, int value) { // maybe it is better to overload setCoordinate..
+	public void setCoordinate(int x, int y, int value) {
 		board[x][y] = value;
 	}
 
@@ -420,7 +420,7 @@ public class State {
 	 */
 	public boolean equals(State s) {
 		if (s == null)
-			return false; // what if "this" is null too???
+			return false;
 		return this.toString().equals(s.toString());
 	}
 
@@ -442,12 +442,12 @@ public class State {
 	 * This heuristic is based on the Manhattan distance heuristic with a change that is multiplying the steps by the color of each tile.
 	 * @return the value of the heuristic function.
 	 */
-	public int heuristic() { // what to do with the black tiles? infinite value?
+	public int heuristic() {
 		int manhattanDistanceSum = 0;
 		for (int x = 0; x < rowsNum; x++) // x-dimension, traversing rows (i)
 			for (int y = 0; y < columnsNum; y++) { // y-dimension, traversing cols (j)
 				int value = board[x][y]; // tiles array contains board elements
-				if (value != 0 && !(black.contains(value))) { // we don't compute MD for element 0
+				if (value != 0 && !(black.contains(value))) { // we don't compute MD for element 0 and black tiles
 					int targetX = (value - 1) / columnsNum; // expected x-coordinate (row)
 					int targetY = (value - 1) % columnsNum; // expected y-coordinate (col)
 					int dx = x - targetX; // x-distance to expected coordinate

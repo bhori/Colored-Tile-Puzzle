@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Stack;
 
@@ -11,7 +12,7 @@ public class IDA_star_search implements search_algorithm {
 	private SearchInfo info;
 
 	/**
-	 * Run the search on the given game and returns its result.
+	 * Runs the search on the given game and returns its result.
 	 */
 	@Override
 	public SearchInfo solve(State start, State goal, boolean withOpen) {
@@ -19,12 +20,14 @@ public class IDA_star_search implements search_algorithm {
 		info = new SearchInfo(start, count);
 		if (start.blackInPlace()) {
 			Stack<State> stack = new Stack<State>();
-			Hashtable<String, State> openList = new Hashtable<String, State>();
+			HashMap<String, State> openList = new HashMap<String, State>();
 			int threshold = start.heuristic();
 			start.setCount(count);
-			while (threshold < Integer.MAX_VALUE) {
+			while (threshold != Integer.MAX_VALUE) {
 				int min = Integer.MAX_VALUE;
 				start.setOut(0);
+				stack.clear();
+				openList.clear();
 				stack.push(start);
 				openList.put(start.toString(), start);
 				while (!(stack.isEmpty())) {
@@ -32,7 +35,7 @@ public class IDA_star_search implements search_algorithm {
 						printOpenList(openList);
 					State node = stack.pop();
 					if (node.getOut() == 1) {
-						openList.remove(node.toString());
+						openList.remove(node.toString(), node);
 					} else {
 						node.setOut(1);
 						stack.push(node);
@@ -51,7 +54,7 @@ public class IDA_star_search implements search_algorithm {
 								State old = openList.get(son.toString());
 								if (old.f() > son.f()) {
 									stack.remove(old);
-									openList.remove(old.toString());
+									openList.remove(old.toString(), old);
 								} else {
 									continue;
 								}
@@ -80,7 +83,7 @@ public class IDA_star_search implements search_algorithm {
 	 * Prints the open list.
 	 * @param openList the required list to be printed.
 	 */
-	private void printOpenList(Hashtable<String, State> openList) {
+	private void printOpenList(HashMap<String, State> openList) {
 		for (String state : openList.keySet()) {
 			System.out.println(state);
 		}

@@ -47,6 +47,7 @@ public class SearchInfo {
 	}
 	
 	/**
+	 * Returns the path of the game.
 	 * @return the path of the game.
 	 */
 	public String getPath() {
@@ -70,6 +71,7 @@ public class SearchInfo {
 	}
 	
 	/**
+	 * Returns the cost of the path.
 	 * @return the cost of the path.
 	 */
 	public int getCost() {
@@ -77,8 +79,8 @@ public class SearchInfo {
 	}
 	
 	/**
-	 * Updates the of the path.
-	 * @param cost
+	 * Updates the cost of the path.
+	 * @param cost the new cost.
 	 */
 	public void setCost(int cost) {
 		this.cost = cost;

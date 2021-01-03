@@ -41,7 +41,7 @@ public class DFBnB_search implements search_algorithm{
 	}
 
 	/**
-	 * Run the search on the given game and returns its result.
+	 * Runs the search on the given game and returns its result.
 	 */
 	@Override
 	public SearchInfo solve(State start, State goal, boolean withOpen) {
